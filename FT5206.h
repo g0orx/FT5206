@@ -69,7 +69,7 @@ enum FT5206isr{ INTRL=0, SAFE, EXTRLN };
 class FT5206 {
  public:
 	FT5206(uint8_t CTP_INT);
-	void 				begin(enum FT5206isr init=INTRL);
+	void 				begin(enum FT5206isr init=INTRL, TwoWire *I2Cpipe=&Wire);
 	uint8_t 			getTScoordinates(uint16_t (*touch_coordinates)[2], uint8_t *reg);
 	void 				getTSregisters(uint8_t *registers);
 	bool 				touched();
@@ -81,6 +81,7 @@ class FT5206 {
 	void 				rearmISR(void);
  private:
 	static void 		 isr(void);
+	TwoWire *__Wire;
 	uint8_t 			_ctpInt;
 	uint8_t				_maxTouch;
 	enum FT5206isr 		_isrMode;

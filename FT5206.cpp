@@ -32,12 +32,13 @@ void FT5206::isr(void)
 
 
 //in EXTRLN the entire ISR it's not handled by the library!
-void FT5206::begin(enum FT5206isr init) 
+void FT5206::begin(enum FT5206isr init, TwoWire *I2Cpipe) 
 {
     _isrMode = init;
-    Wire.begin();
+    __Wire=I2Cpipe;
+    __Wire->begin();
 	#if ARDUINO >= 157
-		Wire.setClock(400000UL); // Set I2C frequency to 400kHz
+		__Wire->setClock(400000UL); // Set I2C frequency to 400kHz
 	#else
 		TWBR = ((F_CPU / 400000UL) - 16) / 2; // Set I2C frequency to 400kHz
 	#endif
@@ -86,10 +87,10 @@ bool FT5206::touched()
 
 void FT5206::writeRegister(uint8_t reg,uint8_t val)
 {
-    Wire.beginTransmission(FT5206_I2C_ADDRESS);
-    Wire.write(reg);
-    Wire.write(val);
-    Wire.endTransmission(FT5206_I2C_ADDRESS);
+    __Wire->beginTransmission(FT5206_I2C_ADDRESS);
+    __Wire->write(reg);
+    __Wire->write(val);
+    __Wire->endTransmission(FT5206_I2C_ADDRESS);
 }
  
  
@@ -119,10 +120,10 @@ uint8_t FT5206::getTScoordinates(uint16_t (*touch_coordinates)[2], uint8_t *reg)
 
 void FT5206::getTSregisters(uint8_t *registers) 
 {
-    Wire.requestFrom(FT5206_I2C_ADDRESS, FT5206_REGISTERS); 
+    __Wire->requestFrom(FT5206_I2C_ADDRESS, FT5206_REGISTERS); 
     uint8_t register_number = 0;
-    while(Wire.available()) {
-      registers[register_number++] = Wire.read();
+    while(__Wire->available()) {
+      registers[register_number++] = __Wire->read();
     }
 }
   
